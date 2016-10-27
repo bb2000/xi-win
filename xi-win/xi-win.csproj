@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="CoreCommunication.cs" />
     <Compile Include="Editor.cs" />
+    <Compile Include="ICommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

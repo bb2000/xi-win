@@ -14,7 +14,7 @@ namespace xi_win
             var core = new CoreCommunication();
             core.StartInputLoop();
 
-            var result = core.SendRawCommand("{\"id\":0,\"method\":\"new_tab\",\"params\":[]}");
+            var result = core.SendRawCommand("{\"id\":0,\"method\":\"new_tab\",\"params\":[]}", true);
 
             core.Dispose();
         }

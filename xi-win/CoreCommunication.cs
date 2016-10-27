@@ -104,7 +104,7 @@ namespace xi_win
             }
         }
 
-        public String SendRawCommand(String command)
+        public String SendRawCommand(String command, bool waitForResponse)
         {
             if (command.Last() != '\n')
             {
@@ -113,6 +113,11 @@ namespace xi_win
 
             stdin.Write(command);
             stdin.Flush();
+
+            if (!waitForResponse)
+            {
+                return null;
+            }
 
             while (inputBuffer.Length == 0 || inputBuffer.Last() != '\n')
             {
@@ -123,6 +128,25 @@ namespace xi_win
             inputBuffer = "";
 
             return commandResponse;
+        }
+
+        public ICommand SendCommand(ICommand command, bool waitForResponse)
+        {
+            string response = SendRawCommand(command.ToJSON(), waitForResponse);
+
+            if (response == null)
+            {
+                return null;
+            }
+            else
+            {
+                return CommandParser.Parse(response);
+            }
+        }
+
+        public ICommand SendCommand(ICommand command)
+        {
+            return SendCommand(command, true);
         }
 
         public String CheckForCommand()
