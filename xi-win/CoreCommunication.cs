@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace xi_win
 {
@@ -13,6 +13,8 @@ namespace xi_win
         StreamReader stdout;
         StreamWriter stdin;
         Process process;
+        String inputBuffer;
+        Thread inputThread;
 
         public CoreCommunication()
         {
@@ -28,6 +30,8 @@ namespace xi_win
             this.stdin = a.stdin;
             this.stdout = a.stdout;
             this.process = a.process;
+            this.inputBuffer = a.inputBuffer;
+            this.inputThread = a.inputThread;
         }
 
         public CoreCommunication(string xi_core)
@@ -56,6 +60,78 @@ namespace xi_win
             this.stdout = stdout;
             this.stdin = stdin;
             this.process = process;
+            this.inputBuffer = "";
+            this.inputThread = null;
+        }
+
+        internal void InputLoop()
+        {
+            while (true)
+            {
+                char inputChar = Convert.ToChar(stdout.Read());
+                inputBuffer = inputBuffer + inputChar;
+            }
+        }
+
+        public void StartInputLoop()
+        {
+            if (inputThread != null)
+            {
+                return;
+            }
+            else
+            {
+                try
+                {
+                    inputThread = new Thread(InputLoop);
+                    inputThread.Start();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+        }
+
+        public void StopInputLoop()
+        {
+            if (inputThread == null)
+            {
+                return;
+            }
+            else
+            {
+                try
+                {
+                    inputThread.Abort();
+                    inputThread = null;
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+        }
+
+        public String SendRawCommand(String command)
+        {
+            if (command.Last() != '\n')
+            {
+                command = command + '\n';
+            }
+
+            stdin.Write(command);
+            stdin.Flush();
+
+            while (inputBuffer.Length == 0 || inputBuffer.Last() != '\n')
+            {
+                continue;
+            }
+
+            String commandResult = inputBuffer;
+            inputBuffer = "";
+
+            return commandResult;
         }
     }
 }
