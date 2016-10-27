@@ -5,16 +5,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace xi_win
 {
-    public class CoreCommunication
+    public class CoreCommunication : IDisposable
     {
         StreamReader stdout;
         StreamWriter stdin;
         Process process;
         String inputBuffer;
         Thread inputThread;
+        volatile bool inputTaskRunning;
 
         public CoreCommunication()
         {
@@ -32,6 +34,7 @@ namespace xi_win
             this.process = a.process;
             this.inputBuffer = a.inputBuffer;
             this.inputThread = a.inputThread;
+            this.inputTaskRunning = a.inputTaskRunning;
         }
 
         public CoreCommunication(string xi_core)
@@ -66,10 +69,17 @@ namespace xi_win
 
         internal void InputLoop()
         {
-            while (true)
+            while (inputTaskRunning)
             {
-                char inputChar = Convert.ToChar(stdout.Read());
-                inputBuffer = inputBuffer + inputChar;
+                var inputTask = Task.Run(() => stdout.Read());
+                if (inputTask.Wait(TimeSpan.FromMilliseconds(100)))
+                {
+                    if (inputTask.Result > 0)
+                    {
+                        char inputChar = Convert.ToChar(inputTask.Result);
+                        inputBuffer = inputBuffer + inputChar;
+                    }
+                }
             }
         }
 
@@ -84,27 +94,8 @@ namespace xi_win
                 try
                 {
                     inputThread = new Thread(InputLoop);
+                    inputTaskRunning = true;
                     inputThread.Start();
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
-            }
-        }
-
-        public void StopInputLoop()
-        {
-            if (inputThread == null)
-            {
-                return;
-            }
-            else
-            {
-                try
-                {
-                    inputThread.Abort();
-                    inputThread = null;
                 }
                 catch (Exception e)
                 {
@@ -128,10 +119,32 @@ namespace xi_win
                 continue;
             }
 
-            String commandResult = inputBuffer;
+            String commandResponse = inputBuffer;
             inputBuffer = "";
 
-            return commandResult;
+            return commandResponse;
+        }
+
+        public String CheckForCommand()
+        {
+            if (inputBuffer.Length == 0 || inputBuffer.Last() != '\n')
+            {
+                return null;
+            }
+            else
+            {
+                String command = inputBuffer;
+                inputBuffer = "";
+                return inputBuffer;
+            }
+        }
+
+        public void Dispose()
+        {
+            inputTaskRunning = false;
+            Thread.Sleep(100);
+            stdin.Close();
+            stdout.Close();
         }
     }
 }

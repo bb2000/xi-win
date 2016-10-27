@@ -16,7 +16,7 @@ namespace xi_win
 
             var result = core.SendRawCommand("{\"id\":0,\"method\":\"new_tab\",\"params\":[]}");
 
-            core.StopInputLoop();
+            core.Dispose();
         }
     }
 }
