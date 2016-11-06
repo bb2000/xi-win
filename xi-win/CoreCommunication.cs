@@ -16,6 +16,7 @@ namespace xi_win
         Process process;
         String inputBuffer;
         Thread inputThread;
+        public string xicoreexe;
         volatile bool inputTaskRunning;
 
         public CoreCommunication()
@@ -35,6 +36,7 @@ namespace xi_win
             this.inputBuffer = a.inputBuffer;
             this.inputThread = a.inputThread;
             this.inputTaskRunning = a.inputTaskRunning;
+            this.xicoreexe = xi_core;
         }
 
         public CoreCommunication(string xi_core)
@@ -65,6 +67,7 @@ namespace xi_win
             this.process = process;
             this.inputBuffer = "";
             this.inputThread = null;
+            this.xicoreexe = null;
         }
 
         internal void InputLoop()
@@ -72,9 +75,9 @@ namespace xi_win
             while (inputTaskRunning)
             {
                 var inputTask = Task.Run(() => stdout.Read());
-                if (inputTask.Wait(TimeSpan.FromMilliseconds(100)))
+                if (inputTask.Wait(TimeSpan.FromMilliseconds(10000)))
                 {
-                    if (inputTask.Result > 0)
+                    if (inputTask.Result != -1)
                     {
                         char inputChar = Convert.ToChar(inputTask.Result);
                         inputBuffer = inputBuffer + inputChar;
@@ -147,6 +150,12 @@ namespace xi_win
         public ICommand SendCommand(ICommand command)
         {
             return SendCommand(command, true);
+        }
+
+        public void DebugSendCommand(ICommand command, bool waitForResponse)
+        {
+            Console.Write(SendRawCommand(command.ToJSON(), waitForResponse));
+            Console.ReadLine();
         }
 
         public String CheckForCommand()
