@@ -156,6 +156,7 @@ namespace xi_win
         {
             Console.Write(SendRawCommand(command.ToJSON(), waitForResponse));
             Console.ReadLine();
+            this.CheckForCommand(); // Hacky solution to error missing return value problem; TODO: FIX THIS
         }
 
         public String CheckForCommand()

@@ -152,6 +152,46 @@ namespace xi_win {
         }
     }
 
+    public class SaveCommand : ICommand
+    {
+        string filename;
+
+        public SaveCommand(int ID, string filename)
+        {
+            this.filename = filename;
+        }
+
+        public string GetCommandType()
+        {
+            return "save";
+        }
+
+        public int GetID()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetParameterFromKey(string key)
+        {
+            if (key == "params")
+            {
+                return "{\"filename\":\"" + filename + "\"}";
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public ICommand Parse(string command)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ToJSON()
+        {
+            return "{\"method\":\"save\",\"params\":{\"filename\":\"" + filename + "\"}}";
+        }
+    }
+
     public class RenderLinesCommand : ICommand
     {
         int ID;
@@ -179,7 +219,7 @@ namespace xi_win {
         {
             if (key == "params")
             {
-                return "{first_line:" + first_line.ToString() + ",last_line: " + last_line.ToString() + "}";
+                return "{\"first_line\":" + first_line.ToString() + ",\"last_line\": " + last_line.ToString() + "}";
             }
             throw new NotImplementedException();
         }
@@ -192,6 +232,130 @@ namespace xi_win {
         public string ToJSON()
         {
             return "{\"id\":" + ID.ToString() + ",\"method\":\"render_lines\",\"params\":{first_line:" + first_line.ToString() + ",last_line:" + last_line.ToString() + "}}";
+        }
+    }
+
+    public class InsertCommand : ICommand
+    {
+        string chars;
+
+        public InsertCommand(string chars)
+        {
+            this.chars = chars;
+        }
+
+        public string GetCommandType()
+        {
+            return "insert";
+        }
+
+        public int GetID()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetParameterFromKey(string key)
+        {
+            if (key == "params") {
+                return "{\"chars\":\"" + chars + "\"}";
+            }
+            throw new NotImplementedException();
+        }
+
+        public ICommand Parse(string command)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ToJSON()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ScrollCommand : ICommand
+    {
+        int firstline;
+        int lastline; // This is non-inclusive
+
+        public ScrollCommand(int firstline, int lastline)
+        {
+            this.firstline = firstline;
+            this.lastline = lastline;
+        }
+
+        public string GetCommandType()
+        {
+            return "scroll";
+        }
+
+        public int GetID()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetParameterFromKey(string key)
+        {
+            if (key == "params")
+            {
+                return "[" + firstline.ToString() + "," + lastline.ToString() + "]";
+            }
+            throw new NotImplementedException();
+        }
+
+        public ICommand Parse(string command)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ToJSON()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ClickCommand : ICommand
+    {
+        int line;
+        int col;
+        int modifiers; // 2 is shift
+        int count;
+
+        public ClickCommand(int line, int col, int modifiers, int count)
+        {
+            this.line = line;
+            this.col = col;
+            this.modifiers = modifiers;
+            this.count = count;
+        }
+
+        public string GetCommandType()
+        {
+            return "click";
+        }
+
+        public int GetID()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetParameterFromKey(string key)
+        {
+            if (key == "params")
+            {
+                return "[" + line.ToString() + "," + col.ToString() + "," + modifiers.ToString() + "," + count.ToString() + "]";
+            }
+            throw new NotImplementedException();
+        }
+
+        public ICommand Parse(string command)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ToJSON()
+        {
+            throw new NotImplementedException();
         }
     }
 
