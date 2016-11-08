@@ -359,6 +359,82 @@ namespace xi_win {
         }
     }
 
+    public class DragCommand : ICommand
+    {
+        int line;
+        int col;
+        int modifiers;
+
+        public DragCommand(int line, int col, int modifiers)
+        {
+            this.line = line;
+            this.col = col;
+            this.modifiers = modifiers;
+        }
+
+        public string GetCommandType()
+        {
+            return "drag";
+        }
+
+        public int GetID()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetParameterFromKey(string key)
+        {
+            if (key == "params")
+            {
+                return "[" + line.ToString() + "," + col.ToString() + "," + modifiers.ToString() + "]";
+            }
+            throw new NotImplementedException();
+        }
+
+        public ICommand Parse(string command)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ToJSON()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class InsertNewlineCommand : ICommand
+    {
+        public InsertNewlineCommand()
+        {
+
+        }
+
+        public string GetCommandType()
+        {
+            return "insert_newline";
+        }
+
+        public int GetID()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetParameterFromKey(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ICommand Parse(string command)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ToJSON()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class EditCommand : ICommand
     {
         int ID;
@@ -394,7 +470,14 @@ namespace xi_win {
 
         public string ToJSON()
         {
-            return "{\"id\":" + ID.ToString() + ",\"method\":\"edit\",\"params\":{\"method\":\"" + interior_command.GetCommandType() + "\",\"params\":" + interior_command.GetParameterFromKey("params") + ",\"tab\":\"" + tab + "\"}}";
+            if (interior_command.GetCommandType() == "insert_newline")
+            {
+                return "{\"id\":" + ID.ToString() + ",\"method\":\"edit\",\"params\":{\"method\":\"" + interior_command.GetCommandType() + "\",\"params\":" + interior_command.GetParameterFromKey("params") + ",\"tab\":\"" + tab + "\"}}";
+            }
+            else
+            {
+                return "{\"id\":" + ID.ToString() + ",\"method\":\"edit\",\"params\":{\"method\":\"" + interior_command.GetCommandType() + "\",\"params\":" + interior_command.GetParameterFromKey("params") + ",\"tab\":\"" + tab + "\"}}";
+            }
         }
     }
 }
