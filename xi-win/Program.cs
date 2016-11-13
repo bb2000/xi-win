@@ -32,8 +32,8 @@ namespace xi_win
             //core.CheckForCommand();
             
 
-            EditCommand ec2 = new EditCommand(2, "0", rlc);
-            core.DebugSendCommand(ec2, true);
+            //EditCommand ec2 = new EditCommand(2, "0", rlc);
+            //core.DebugSendCommand(ec2, true);
 
             InsertCommand ic = new InsertCommand("a");
             EditCommand ec3 = new EditCommand(3, "0", ic);
