@@ -147,6 +147,21 @@ namespace xi_win
             }
         }
 
+        public ICommand RecieveCommand()
+        {
+            if (inputBuffer.Last() == '\n')
+            {
+                string response = inputBuffer;
+                inputBuffer = "";
+
+                return CommandParser.Parse(response);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public ICommand SendCommand(ICommand command)
         {
             return SendCommand(command, true);

@@ -15,7 +15,7 @@ namespace xi_win
             core.StartInputLoop();
 
             NewTabCommand ntc = new NewTabCommand(0);
-            core.DebugSendCommand(ntc, true);
+            core.SendCommand(ntc, true);
 
             //DeleteTabCommand dtc = new DeleteTabCommand(0, "1");
             //core.DebugSendCommand(dtc, false);
@@ -28,7 +28,7 @@ namespace xi_win
 
             RenderLinesCommand rlc = new RenderLinesCommand(0, 1, 3);
             EditCommand ec = new EditCommand(1, "0", oc);
-            core.DebugSendCommand(ec, true);
+            core.SendCommand(ec, true);
             //core.CheckForCommand();
             
 

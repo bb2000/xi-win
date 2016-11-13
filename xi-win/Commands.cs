@@ -44,25 +44,57 @@ namespace xi_win {
         int id;
         string result;
 
+        public NewTabResponse(int id, string result)
+        {
+            this.id = id;
+            this.result = result;
+        }
+
         public string GetCommandType()
         {
-            throw new NotImplementedException();
+            return "new_tab_response";
         }
 
         public int GetID()
         {
-            throw new NotImplementedException();
+            return id;
         }
 
         public string GetParameterFromKey(string key)
         {
+            if (key == "result")
+            {
+                return result;
+            }
             throw new NotImplementedException();
+        }
+
+        public static ICommand ParseStatic(string command)
+        {
+            if (!command.Contains("result"))
+            {
+                return null;
+            }
+            else
+            {
+                var parsedJSON = JsonConvert.DeserializeObject<NewTabResponse>(command);
+                return parsedJSON;
+            }
         }
 
         public ICommand Parse(string command)
         {
-            throw new NotImplementedException();
+            if (!command.Contains("result"))
+            {
+                return null;
+            }
+            else
+            {
+                var parsedJSON = JsonConvert.DeserializeObject<NewTabResponse>(command);
+                return parsedJSON;
+            }
         }
+
 
         public string ToJSON()
         {
@@ -1066,6 +1098,19 @@ namespace xi_win {
             throw new NotImplementedException();
         }
 
+        public static ICommand ParseStatic(string command)
+        {
+            if (!command.Contains("\"error\":"))
+            {
+                return null;
+            }
+            else
+            {
+                var parsedJSON = JsonConvert.DeserializeObject<ErrorCommand>(command);
+                return parsedJSON;
+            }
+        }
+
         public ICommand Parse(string command)
         {
             if (!command.Contains("\"error\":"))
@@ -1083,5 +1128,14 @@ namespace xi_win {
         {
             throw new NotImplementedException();
         }
+    }
+
+    public class UpdateCommand 
+    {
+        int id;
+        string tab;
+        string first_line;
+        string height;
+        
     }
 }

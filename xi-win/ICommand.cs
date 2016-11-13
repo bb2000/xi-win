@@ -20,7 +20,17 @@ namespace xi_win
     {
         public static ICommand Parse(string Command)
         {
-            return null;
+            if (ErrorCommand.ParseStatic(Command) != null)
+            {
+                return ErrorCommand.ParseStatic(Command);
+            }
+            else if (NewTabResponse.ParseStatic(Command) != null)
+            {
+                return NewTabResponse.ParseStatic(Command);
+            } else
+            {
+                throw new InvalidOperationException();
+            }
         }
 
         public static string ParseObject(object element)
