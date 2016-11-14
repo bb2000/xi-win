@@ -149,11 +149,10 @@ namespace xi_win
 
         public ICommand RecieveCommand()
         {
-            if (inputBuffer.Last() == '\n')
+            if (inputBuffer.Contains('\n'))
             {
-                string response = inputBuffer;
-                inputBuffer = "";
-
+                var nlIndex = inputBuffer.IndexOf('\n');
+                string response = inputBuffer.Remove(0, nlIndex);
                 return CommandParser.Parse(response);
             }
             else

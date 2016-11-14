@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace xi_win {
     public class NewTabCommand : ICommand
@@ -1130,12 +1131,110 @@ namespace xi_win {
         }
     }
 
-    public class UpdateCommand 
+    public class Line
     {
-        int id;
+        string text;
+        int cursor;
+        Tuple<int, int> sel;
+        Tuple<int, int, int> fg;
+
+        public Line(JToken line)
+        {
+            this.text = line.First.Value<string>();
+
+            int index = 0;
+            foreach (var val in line)
+            {
+                if (index != 0)
+                {
+                    var argArray = val as JArray;
+                    var argType = argArray[0].Value<string>();
+
+                    switch (argType)
+                    {
+                        case "cursor":
+                            this.cursor = argArray[1].Value<int>();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                index++;
+            }
+        }
+    }
+
+    public class UpdateCommand : ICommand
+    {
         string tab;
-        string first_line;
-        string height;
-        
+        int first_line;
+        int height;
+        List<Line> lines;
+        Tuple<int, int> scrollto;
+
+        public UpdateCommand()
+        {
+
+        }
+
+        public string ToJSON()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ICommand Parse(string command)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static ICommand ParseJSONNET(Newtonsoft.Json.Linq.JObject Jsobject)
+        {
+            UpdateCommand command = new UpdateCommand();
+            command.lines = new List<Line>();
+
+            Newtonsoft.Json.Linq.JToken parameters = Jsobject.GetValue("params");
+            command.tab = parameters.Value<string>("tab").ToString();
+
+            var updateParameters = parameters.Value<JToken>("update");
+
+            command.first_line = updateParameters.Value<int>("first_line");
+            command.height = updateParameters.Value<int>("height");
+
+            var lineArray = updateParameters.Value<JArray>("lines");
+
+            foreach (var line in lineArray)
+            {
+                command.lines.Add(new Line(line));
+            }
+
+            return command;
+        }
+
+        public static ICommand ParseStatic(string command)
+        {
+            if (!command.Contains("update"))
+            {
+                return null;
+            }
+            else
+            {
+                return ParseJSONNET(JsonConvert.DeserializeObject(command) as Newtonsoft.Json.Linq.JObject);
+            }
+        }
+
+        public int GetID()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetCommandType()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetParameterFromKey(string key)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

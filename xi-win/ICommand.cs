@@ -24,10 +24,15 @@ namespace xi_win
             {
                 return ErrorCommand.ParseStatic(Command);
             }
+            else if (UpdateCommand.ParseStatic(Command) != null)
+            {
+                return UpdateCommand.ParseStatic(Command);
+            }
             else if (NewTabResponse.ParseStatic(Command) != null)
             {
                 return NewTabResponse.ParseStatic(Command);
-            } else
+            }
+            else
             {
                 throw new InvalidOperationException();
             }

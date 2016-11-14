@@ -37,14 +37,14 @@ namespace xi_win
 
             InsertCommand ic = new InsertCommand("a");
             EditCommand ec3 = new EditCommand(3, "0", ic);
-            core.DebugSendCommand(ec3, true);
+            core.SendCommand(ec3, true);
 
             InsertNewlineCommand inc = new InsertNewlineCommand();
             EditCommand ec32 = new EditCommand(5, "0", inc);
-            core.DebugSendCommand(ec32, true);
+            core.SendCommand(ec32, true);
 
             EditCommand ec4 = new EditCommand(4, "0", sc);
-            core.DebugSendCommand(ec4, true);
+            core.SendCommand(ec4, true);
 
             core.Dispose();
         }
