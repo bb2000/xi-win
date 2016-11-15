@@ -122,15 +122,7 @@ namespace xi_win
                 return null;
             }
 
-            while (inputBuffer.Length == 0 || inputBuffer.Last() != '\n')
-            {
-                continue;
-            }
-
-            String commandResponse = inputBuffer;
-            inputBuffer = "";
-
-            return commandResponse;
+            return RecieveRawCommand();
         }
 
         public ICommand SendCommand(ICommand command, bool waitForResponse)
@@ -154,6 +146,19 @@ namespace xi_win
                 var nlIndex = inputBuffer.IndexOf('\n');
                 string response = inputBuffer.Remove(0, nlIndex);
                 return CommandParser.Parse(response);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public string RecieveRawCommand()
+        {
+            if (inputBuffer.Contains('\n'))
+            {
+                var nlIndex = inputBuffer.IndexOf('\n');
+                return inputBuffer.Remove(0, nlIndex);
             }
             else
             {

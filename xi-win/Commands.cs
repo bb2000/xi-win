@@ -1207,6 +1207,12 @@ namespace xi_win {
                 command.lines.Add(new Line(line));
             }
 
+            var scrollto = updateParameters.Value<JToken>("srcollto");
+            if (scrollto != null)
+            {
+                throw new NotImplementedException("What does a scrollto look like?");
+            }
+
             return command;
         }
 
