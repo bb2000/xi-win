@@ -34,7 +34,7 @@ namespace xi_win
             }
             else
             {
-                throw new InvalidOperationException();
+                return null;
             }
         }
 

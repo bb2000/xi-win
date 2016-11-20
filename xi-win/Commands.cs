@@ -1133,7 +1133,7 @@ namespace xi_win {
 
     public class Line
     {
-        string text;
+        public string text;
         int cursor;
         Tuple<int, int> sel;
         Tuple<int, int, int> fg;
@@ -1235,7 +1235,7 @@ namespace xi_win {
 
         public string GetCommandType()
         {
-            throw new NotImplementedException();
+            return "update";
         }
 
         public string GetParameterFromKey(string key)

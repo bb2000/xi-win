@@ -144,7 +144,8 @@ namespace xi_win
             if (inputBuffer.Contains('\n'))
             {
                 var nlIndex = inputBuffer.IndexOf('\n');
-                string response = inputBuffer.Remove(0, nlIndex);
+                string response = inputBuffer.Substring(0, nlIndex);
+                inputBuffer = inputBuffer.Remove(0, nlIndex + 1);
                 return CommandParser.Parse(response);
             }
             else
@@ -155,6 +156,10 @@ namespace xi_win
 
         public string RecieveRawCommand()
         {
+            while (!inputBuffer.Contains('\n'))
+            {
+                continue;
+            }
             if (inputBuffer.Contains('\n'))
             {
                 var nlIndex = inputBuffer.IndexOf('\n');

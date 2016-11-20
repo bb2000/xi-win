@@ -3,26 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Threading;
 
 namespace xi_win
 {
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
-            var core = new CoreCommunication();
-            core.StartInputLoop();
+            var window = new EditorUI();
+            window.Show();
+            System.Windows.Threading.Dispatcher.Run();
+            
 
-            NewTabCommand ntc = new NewTabCommand(0);
+            //windowThread.SetApartmentState(ApartmentState.)
+
+            /*NewTabCommand ntc = new NewTabCommand(0);
             core.SendCommand(ntc, true);
 
             //DeleteTabCommand dtc = new DeleteTabCommand(0, "1");
             //core.DebugSendCommand(dtc, false);
 
-            OpenCommand oc = new OpenCommand(1, "C:\\\\Users\\\\walshb\\\\OneDrive\\\\Personal\\\\Path Variable SLP-BB-WalshB.txt");
-            SaveCommand sc = new SaveCommand(1, "C:\\\\Users\\\\walshb\\\\OneDrive\\\\Personal\\\\Path Variable SLP-BB-WalshB.txt");
-            //OpenCommand oc = new OpenCommand(1, "D:\\\\Bradyn Walsh\\\\OneDrive\\\\Personal\\\\Path Variable SLP-BB-WalshB.txt");
+            //OpenCommand oc = new OpenCommand(1, "C:\\\\Users\\\\walshb\\\\OneDrive\\\\Personal\\\\Path Variable SLP-BB-WalshB.txt");
+            //SaveCommand sc = new SaveCommand(1, "C:\\\\Users\\\\walshb\\\\OneDrive\\\\Personal\\\\Path Variable SLP-BB-WalshB.txt");
+            OpenCommand oc = new OpenCommand(1, "D:\\\\Bradyn Walsh\\\\OneDrive\\\\Personal\\\\Path Variable SLP-BB-WalshB.txt");
+            SaveCommand sc = new SaveCommand(1, "D:\\\\Bradyn Walsh\\\\OneDrive\\\\Personal\\\\Path Variable SLP-BB-WalshB.txt");
             //OpenCommand oc = new OpenCommand(1, "C:\\Users\\walshb\\OneDrive\\School\\2016 (Year 10)\\Food Technology\\Food Trucks\\Food Truck Investigation Assignment.docx");
             //core.DebugSendCommand(oc, false);
 
@@ -46,7 +52,7 @@ namespace xi_win
             EditCommand ec4 = new EditCommand(4, "0", sc);
             core.SendCommand(ec4, true);
 
-            core.Dispose();
+            core.Dispose();*/
         }
     }
 }
