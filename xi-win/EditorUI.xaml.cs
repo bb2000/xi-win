@@ -363,7 +363,7 @@ namespace xi_win
         {
             if (e.Key == Key.Back)
             {
-                textBox.CaretIndex -= 1;
+                //textBox.CaretIndex -= 1;
                 UpdateRender();
 
                 DeleteBackwardCommand dbc = new DeleteBackwardCommand();

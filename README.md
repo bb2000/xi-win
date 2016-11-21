@@ -22,3 +22,4 @@ To get back to editing, press Escape.
 *   No error messages for file not found errors
 *   Shift+Num does not show special character, but just that number
 *   Copy and paste does not work
+*   Some keys (such as tab) will not work properly
