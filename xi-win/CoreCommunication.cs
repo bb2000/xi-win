@@ -165,7 +165,7 @@ namespace xi_win
             {
                 var nlIndex = inputBuffer.IndexOf('\n');
                 string response = inputBuffer.Substring(0, nlIndex);
-                inputBuffer = inputBuffer.Remove(0, nlIndex + 1);
+                inputBuffer = inputBuffer.Remove(0, nlIndex);
                 return response;
             }
             else
