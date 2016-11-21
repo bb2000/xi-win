@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace xi_win
 {
+    // Interface for a command to be sent or received from xi-core
     public interface ICommand
     {
-        String ToJSON();
-        ICommand Parse(string command);
+        String ToJSON(); // Convert command to JSON to be sent to core
+        ICommand Parse(string command); // Parse incoming command
 
-        int GetID();
-        String GetCommandType();
-        String GetParameterFromKey(string key);
+        int GetID(); // Get ID of command
+        String GetCommandType(); // Returns type of command
+        String GetParameterFromKey(string key); // Get one of the parameters of the command (differs from command to command)
     }
 
     public class CommandParser

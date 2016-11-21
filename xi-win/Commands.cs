@@ -1167,10 +1167,10 @@ namespace xi_win {
     public class UpdateCommand : ICommand
     {
         string tab;
-        int first_line;
-        int height;
-        List<Line> lines;
-        Tuple<int, int> scrollto;
+        public int first_line;
+        public int height;
+        public List<Line> lines;
+        public Tuple<int, int> scrollto;
 
         public UpdateCommand()
         {

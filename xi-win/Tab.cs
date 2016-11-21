@@ -12,12 +12,14 @@ namespace xi_win
         public string tabName;
         public string fileName;
         List<Line> contents;
+        int firstLine;
 
         public Tab(string name)
         {
             this.tabName = name;
             this.fileName = null;
             this.contents = new List<Line>();
+            this.firstLine = 1;
         }
 
         public Tab(string name, string fileName)
@@ -25,6 +27,7 @@ namespace xi_win
             this.tabName = name;
             this.fileName = fileName;
             this.contents = new List<Line>();
+            this.firstLine = 0;
         }
 
         public void SetContents(List<Line> contents)
@@ -42,6 +45,12 @@ namespace xi_win
             }
 
             return result;
+        }
+
+        public void ProcessUpdate(UpdateCommand command)
+        {
+            this.firstLine = command.first_line;
+            this.contents = command.lines;
         }
     }
 }
