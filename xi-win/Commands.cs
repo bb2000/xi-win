@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace xi_win {
+
+    // Command to create a new tab
     public class NewTabCommand : ICommand
     {
         int ID;
@@ -40,6 +42,7 @@ namespace xi_win {
         }
     }
 
+    //  Response from core after a NewTabCommand
     public class NewTabResponse : ICommand
     {
         int id;
@@ -78,7 +81,9 @@ namespace xi_win {
             }
             else
             {
-                var parsedJSON = JsonConvert.DeserializeObject<NewTabResponse>(command);
+                if (!command.StartsWith("{"))
+                    command = "{" + command; // Fixes weird bug
+                var parsedJSON = JsonConvert.DeserializeObject<NewTabResponse>(command); // Parse to JSON
                 return parsedJSON;
             }
         }
@@ -91,7 +96,7 @@ namespace xi_win {
             }
             else
             {
-                var parsedJSON = JsonConvert.DeserializeObject<NewTabResponse>(command);
+                var parsedJSON = JsonConvert.DeserializeObject<NewTabResponse>(command); // Parses to JSON
                 return parsedJSON;
             }
         }
@@ -103,6 +108,7 @@ namespace xi_win {
         }
     }
 
+    // Command to delete a tab
     public class DeleteTabCommand : ICommand
     {
         int ID;
@@ -147,6 +153,7 @@ namespace xi_win {
         }
     }
 
+    // Command to open a file
     public class OpenCommand : ICommand
     {
         int ID;
@@ -189,6 +196,7 @@ namespace xi_win {
         }
     }
 
+    // Command to save a file
     public class SaveCommand : ICommand
     {
         string filename;
@@ -229,6 +237,7 @@ namespace xi_win {
         }
     }
 
+    // Command to selectively render lines from the core
     public class RenderLinesCommand : ICommand
     {
         int ID;
@@ -272,6 +281,7 @@ namespace xi_win {
         }
     }
 
+    // Command to insert characters
     public class InsertCommand : ICommand
     {
         string chars;
@@ -310,6 +320,7 @@ namespace xi_win {
         }
     }
 
+    // Command to set a scroll reigon for update fragments from core
     public class ScrollCommand : ICommand
     {
         int firstline;
@@ -351,6 +362,7 @@ namespace xi_win {
         }
     }
 
+    // Command to click in the text region
     public class ClickCommand : ICommand
     {
         int line;
@@ -396,11 +408,12 @@ namespace xi_win {
         }
     }
 
+    // Command to drag a selection region (not implemented yet)
     public class DragCommand : ICommand
     {
         int line;
         int col;
-        int modifiers;
+        int modifiers; // 2 is shift
 
         public DragCommand(int line, int col, int modifiers)
         {
@@ -439,6 +452,7 @@ namespace xi_win {
         }
     }
 
+    // Command to issue a Delete button press
     public class DeleteBackwardCommand : ICommand
     {
         public DeleteBackwardCommand()
@@ -476,6 +490,7 @@ namespace xi_win {
         }
     }
 
+    // Inserts a newline (\n) in the file
     public class InsertNewlineCommand : ICommand
     {
         public InsertNewlineCommand()
@@ -512,6 +527,7 @@ namespace xi_win {
         }
     }
 
+    // Issues an up button press
     public class MoveUpCommand : ICommand
     {
         public MoveUpCommand()
@@ -549,6 +565,7 @@ namespace xi_win {
         }
     }
 
+    // Same as above but with any selection being modified
     public class MoveUpAndModifySelectionCommand : ICommand
     {
         public MoveUpAndModifySelectionCommand()
@@ -586,6 +603,7 @@ namespace xi_win {
         }
     }
 
+    // Issues a down command
     public class MoveDownCommand : ICommand
     {
         public MoveDownCommand()
@@ -623,6 +641,7 @@ namespace xi_win {
         }
     }
 
+    // Same as above but with selections being modified
     public class MoveDownAndModifySelectionCommand : ICommand
     {
         public MoveDownAndModifySelectionCommand()
@@ -660,6 +679,7 @@ namespace xi_win {
         }
     }
 
+    // Issues a move left command
     public class MoveLeftCommand : ICommand
     {
         public MoveLeftCommand()
@@ -697,6 +717,7 @@ namespace xi_win {
         }
     }
 
+    // Same as above but with selections being modified
     public class MoveLeftAndModifySelectionCommand : ICommand
     {
         public MoveLeftAndModifySelectionCommand()
@@ -734,6 +755,7 @@ namespace xi_win {
         }
     }
 
+    // Issues a move right command
     public class MoveRightCommand : ICommand
     {
         public MoveRightCommand()
@@ -771,6 +793,7 @@ namespace xi_win {
         }
     }
 
+    // Same as above but with selections being modified
     public class MoveRightAndModifySelectionCommand : ICommand
     {
         public MoveRightAndModifySelectionCommand()
@@ -808,6 +831,7 @@ namespace xi_win {
         }
     }
 
+    // Issues a page up button press with scrolling
     public class ScrollPageUpCommand : ICommand
     {
         public ScrollPageUpCommand()
@@ -845,6 +869,7 @@ namespace xi_win {
         }
     }
 
+    // Issues a page up button press
     public class PageUpCommand : ICommand
     {
         public PageUpCommand()
@@ -882,6 +907,7 @@ namespace xi_win {
         }
     }
 
+    // Same as above but with selections being modified
     public class PageUpAndModifySelectionCommand : ICommand
     {
         public PageUpAndModifySelectionCommand()
@@ -919,6 +945,7 @@ namespace xi_win {
         }
     }
 
+    // Scroll a page down command
     public class ScrollPageDownCommand : ICommand
     {
         public ScrollPageDownCommand()
@@ -956,6 +983,7 @@ namespace xi_win {
         }
     }
 
+    // Issues a page down button press
     public class PageDownCommand : ICommand
     {
         public PageDownCommand()
@@ -993,6 +1021,7 @@ namespace xi_win {
         }
     }
 
+    // Same as above but with selections being modified
     public class PageDownAndModifySelectionCommand : ICommand
     {
         public PageDownAndModifySelectionCommand()
@@ -1030,6 +1059,7 @@ namespace xi_win {
         }
     }
 
+    // General edit command used to process any command for any tab
     public class EditCommand : ICommand
     {
         int ID;
@@ -1069,6 +1099,7 @@ namespace xi_win {
         }
     }
 
+    // Errors returned by core
     public class ErrorCommand : ICommand
     {
         int id;
@@ -1107,7 +1138,9 @@ namespace xi_win {
             }
             else
             {
-                var parsedJSON = JsonConvert.DeserializeObject<ErrorCommand>(command);
+                if (!command.StartsWith("{"))
+                    command = "{" + command; // Fixes weird bug
+                var parsedJSON = JsonConvert.DeserializeObject<ErrorCommand>(command); // Parse JSON
                 return parsedJSON;
             }
         }
@@ -1120,7 +1153,7 @@ namespace xi_win {
             }
             else
             {
-                var parsedJSON = JsonConvert.DeserializeObject<ErrorCommand>(command);
+                var parsedJSON = JsonConvert.DeserializeObject<ErrorCommand>(command); // ParsesJSON
                 return parsedJSON;
             }
         }
@@ -1131,6 +1164,7 @@ namespace xi_win {
         }
     }
 
+    // Representation of lines returned from update
     public class Line
     {
         public string text;
@@ -1143,7 +1177,7 @@ namespace xi_win {
             this.text = line.First.Value<string>();
 
             int index = 0;
-            foreach (var val in line)
+            foreach (var val in line) // Goes through array, assigning values
             {
                 if (index != 0)
                 {
@@ -1164,6 +1198,7 @@ namespace xi_win {
         }
     }
 
+    // Update returned from core after any text-related command
     public class UpdateCommand : ICommand
     {
         string tab;
@@ -1192,7 +1227,7 @@ namespace xi_win {
             UpdateCommand command = new UpdateCommand();
             command.lines = new List<Line>();
 
-            Newtonsoft.Json.Linq.JToken parameters = Jsobject.GetValue("params");
+            Newtonsoft.Json.Linq.JToken parameters = Jsobject.GetValue("params"); // Parses params from JSON
             command.tab = parameters.Value<string>("tab").ToString();
 
             var updateParameters = parameters.Value<JToken>("update");
@@ -1202,7 +1237,7 @@ namespace xi_win {
 
             var lineArray = updateParameters.Value<JArray>("lines");
 
-            foreach (var line in lineArray)
+            foreach (var line in lineArray) // Assigns you lines
             {
                 command.lines.Add(new Line(line));
             }
@@ -1210,7 +1245,7 @@ namespace xi_win {
             var scrollto = updateParameters.Value<JToken>("srcollto");
             if (scrollto != null)
             {
-                throw new NotImplementedException("What does a scrollto look like?");
+                throw new NotImplementedException("What does a scrollto look like?"); // Seriously, this has never been triggered throughout all testing. Probably relies on PgUp/Down which we have not done yet.
             }
 
             return command;
@@ -1224,7 +1259,9 @@ namespace xi_win {
             }
             else
             {
-                return ParseJSONNET(JsonConvert.DeserializeObject(command) as Newtonsoft.Json.Linq.JObject);
+                if (!command.StartsWith("{"))
+                    command = "{" + command; // Fixes weird bug
+                return ParseJSONNET(JsonConvert.DeserializeObject(command) as Newtonsoft.Json.Linq.JObject); // Parses JSON
             }
         }
 

@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:xi_win"
         mc:Ignorable="d"
-        Title="EditorUI" Height="700" Width="700" Closed="closeWindow" MouseDoubleClick="updateTrigger">
+        Title="EditorUI" Height="700" Width="700" Closed="closeWindow" MouseDoubleClick="updateTrigger" MouseMove="updateTrigger">
     <Grid>
         <TabControl x:Name="tabBar" HorizontalAlignment="Left" Height="23" Margin="100,0,0,0" VerticalAlignment="Top" Width="592" MouseLeave="updateTrigger"/>
         <Button x:Name="saveButton" Content=" 💾" HorizontalAlignment="Left" Margin="75,2,0,0" VerticalAlignment="Top" Width="25" Height="21" Click="saveTab"/>
         <Button x:Name="openButton" Content=" 📂" HorizontalAlignment="Left" Margin="50,2,0,0" VerticalAlignment="Top" Width="25" Height="21" Click="openTab"/>
         <Button x:Name="newButton" Content="🗋" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="25" Height="21" Click="NewTab"/>
         <Button x:Name="closeButton" Content=" ╳" HorizontalAlignment="Left" Margin="25,2,0,0" VerticalAlignment="Top" Width="25" Height="21" Click="closeTab"/>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="631" Margin="16,28,0,0" TextWrapping="Wrap" AcceptsReturn="True" Text="TextBox" VerticalAlignment="Top" Width="666" KeyDown="keyPressed"/>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="631" Margin="16,28,0,0" TextWrapping="Wrap" AcceptsReturn="True" Text="TextBox" VerticalAlignment="Top" Width="666" KeyDown="keyPressed" MouseMove="updateTrigger" KeyUp="keyUp" PreviewKeyDown="previewPressed"/>
     </Grid>
 </Window>

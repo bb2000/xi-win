@@ -21,13 +21,8 @@ namespace xi_win
 
         public CoreCommunication()
         {
-            // Gets the file name of the xi core executable from either default value or ENV variable
-            string xi_core = Environment.GetEnvironmentVariable("XI-CORE", EnvironmentVariableTarget.User);
-            if (xi_core == null)
-            {
-                throw new FileNotFoundException("XI-CORE ENV Variable Not Set");
-            }
-            
+            string xi_core = Environment.CurrentDirectory + "\\xi-core.exe"; // Gets xi-core filename in same folder as .exe
+                        
             // Construct class after calling other constructor
             CoreCommunication a = new CoreCommunication(xi_core);
             this.stdin = a.stdin;
@@ -50,7 +45,7 @@ namespace xi_win
             process.StartInfo.RedirectStandardOutput = true;
             try
             {
-                process.Start();
+                process.Start(); // Starts core
             }
             catch (Exception e)
             {
@@ -70,12 +65,13 @@ namespace xi_win
             this.xicoreexe = null;
         }
 
+        // Loop that gets inputs from the core
         internal void InputLoop()
         {
             while (inputTaskRunning)
             {
                 var inputTask = Task.Run(() => stdout.Read());
-                if (inputTask.Wait(TimeSpan.FromMilliseconds(10000)))
+                if (inputTask.Wait(TimeSpan.FromMilliseconds(10000))) // 10 second timeout for the loop
                 {
                     if (inputTask.Result != -1)
                     {
@@ -86,6 +82,7 @@ namespace xi_win
             }
         }
 
+        // Starts input loop
         public void StartInputLoop()
         {
             if (inputThread != null)
@@ -107,6 +104,7 @@ namespace xi_win
             }
         }
 
+        // Sends a raw string to the core
         public String SendRawCommand(String command, bool waitForResponse)
         {
             if (command.Last() != '\n')
@@ -125,6 +123,7 @@ namespace xi_win
             return RecieveRawCommand();
         }
 
+        // Send a command to the core
         public ICommand SendCommand(ICommand command, bool waitForResponse)
         {
             string response = SendRawCommand(command.ToJSON(), waitForResponse);
@@ -139,6 +138,7 @@ namespace xi_win
             }
         }
 
+        // Checks for and recieves command from the core
         public ICommand RecieveCommand()
         {
             if (inputBuffer.Contains('\n'))
@@ -154,6 +154,7 @@ namespace xi_win
             }
         }
 
+        // Checks for and receives a raw string from the core
         public string RecieveRawCommand()
         {
             while (!inputBuffer.Contains('\n'))
@@ -173,11 +174,13 @@ namespace xi_win
             }
         }
 
+        // Sends command with default waitForResponse variable
         public ICommand SendCommand(ICommand command)
         {
             return SendCommand(command, true);
         }
 
+        // Debug function for sending commands
         public void DebugSendCommand(ICommand command, bool waitForResponse)
         {
             Console.Write(SendRawCommand(command.ToJSON(), waitForResponse));
@@ -185,6 +188,7 @@ namespace xi_win
             this.CheckForCommand(); // Hacky solution to error missing return value problem; TODO: FIX THIS
         }
 
+        // Checks for a command from the core
         public String CheckForCommand()
         {
             if (inputBuffer.Length == 0 || inputBuffer.Last() != '\n')
@@ -199,6 +203,7 @@ namespace xi_win
             }
         }
 
+        // End the core process and kill the I/O threads
         public void Dispose()
         {
             inputTaskRunning = false;

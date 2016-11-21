@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace xi_win
 {
-
     public class Tab
     {
         public string tabName;
         public string fileName;
         List<Line> contents;
         int firstLine;
+        public int height;
 
         public Tab(string name)
         {
@@ -30,11 +30,13 @@ namespace xi_win
             this.firstLine = 0;
         }
 
+        // Sets the contents of the tab
         public void SetContents(List<Line> contents)
         {
             this.contents = contents;
         }
 
+        // Gets the contents and turn it into a string
         public string GetText()
         {
             var result = "";
@@ -47,10 +49,12 @@ namespace xi_win
             return result;
         }
 
+        // Process an update command
         public void ProcessUpdate(UpdateCommand command)
         {
             this.firstLine = command.first_line;
             this.contents = command.lines;
+            this.height = command.height;
         }
     }
 }

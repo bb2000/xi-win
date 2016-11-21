@@ -26,8 +26,11 @@ namespace xi_win
         int currentTabIndex;
         int cursorX;
         int cursorY;
+        int currIndex;
 
         bool lCtrl;
+        bool rCtrl;
+        bool shift;
 
         public EditorUI()
         {
@@ -35,13 +38,18 @@ namespace xi_win
             this.core = new CoreCommunication();
             core.StartInputLoop();
             this.currentCommandId = 0;
+            this.currIndex = 0;
             this.currentTabIndex = -1;
             this.tabs = new List<Tab>();
             this.lCtrl = false;
+            this.rCtrl = false;
+
+            textBox.VerticalScrollBarVisibility = ScrollBarVisibility.Visible; // Gives us a scrollbar
 
             OpenInitalTab();
         }
 
+        // Grabs command to update/render UI
         private void UpdateRender()
         {
             // Process commands
@@ -49,17 +57,24 @@ namespace xi_win
             UpdateRender(command);
         }
 
+        // Updates UI State and re-renders
         private void UpdateRender(ICommand command)
         {
             this.currentTabIndex = tabBar.SelectedIndex;
+            this.currIndex = textBox.CaretIndex;
+
             if (command != null)
             {
-                switch (command.GetCommandType())
+                switch (command.GetCommandType()) // Process the command
                 {
                     case "new_tab_response":
                         tabs.Add(new Tab(command.GetParameterFromKey("result")));
                         currentTabIndex = tabs.Count - 1;
                         tabBar.SelectedIndex = currentTabIndex;
+
+                        ScrollCommand sc = new ScrollCommand(0, 1000); // Makes sure that all text is visible
+                        EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, sc);
+                        core.SendCommand(ec, false);
                         break;
                     case "error":
                         break;
@@ -80,14 +95,49 @@ namespace xi_win
 
             foreach (var tab in tabs)
             {
-                tabBar.Items.Add(tab.tabName);
+                tabBar.Items.Add(tab.tabName); // Add each tab to the tabbar
             }
 
             tabBar.SelectedIndex = currentTabIndex;
 
             // Update textbox
+            textBox.Text = "";
+            textBox.CaretIndex = this.currIndex;
             if (currentTabIndex != -1)
+            {
                 textBox.Text = tabs[currentTabIndex].GetText();//.Replace("\n", "\r\n");
+                textBox.CaretIndex = this.currIndex;
+            }
+
+            // Update cursor
+            var cursorIndex = this.currIndex;
+            var oldCursorX = this.cursorX;
+            var oldCursorY = this.cursorY;
+            var currY = 0;
+            var currX = 0;
+            foreach (var line in textBox.Text.Split('\n'))
+            {
+                currY++;
+                if (currX + (line.Length + 1) > cursorIndex)
+                {
+                    this.cursorY = currY - 1;
+                    this.cursorX = cursorIndex - currX;
+                    this.currIndex = cursorIndex;
+                    break;
+                }
+                currX += line.Length;
+                cursorIndex--;
+            }
+
+            // Click on new cursor position if it has changed
+            if (oldCursorX != cursorX || oldCursorY != cursorY)
+            {
+                ClickCommand cc = new ClickCommand(cursorY, cursorX, 0, 1);
+                EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, cc);
+                core.SendCommand(ec, false);
+                Thread.Sleep(100);
+                UpdateRender();
+            }
 
             // Get next command
             ICommand nextCommand = core.RecieveCommand();
@@ -97,11 +147,23 @@ namespace xi_win
             }
         }
 
+        // Opens README.md in exe folder
         private void OpenInitalTab()
         {
-            
+            NewTab();
+
+            string filename = Environment.CurrentDirectory + "\\README.md";
+            filename = filename.Replace("\\", "\\\\");
+            var oc = new OpenCommand(-1, filename);
+            var ec = new EditCommand(GetID(), tabs[tabs.Count - 1].tabName, oc);
+            core.SendCommand(ec, false);
+
+            Thread.Sleep(100);
+
+            UpdateRender();
         }
 
+        // Creates a new tab
         public void NewTab()
         {
             var ntc = new NewTabCommand(GetID());
@@ -110,23 +172,28 @@ namespace xi_win
             UpdateRender();
         }
 
+        // Gets current ID and increment ID
         private int GetID()
         {
             this.currentCommandId++;
             return currentCommandId - 1;
         }
 
+        // Close the app
         private void closeWindow(object sender, EventArgs e)
         {
             core.Dispose();
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvokeShutdown(System.Windows.Threading.DispatcherPriority.Send);
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvokeShutdown(System.Windows.Threading.DispatcherPriority.Send); // I have no idea what this does, but the app won't close without it
         }
 
+        // New Tab button pressed
         private void NewTab(object sender, RoutedEventArgs e)
         {
             NewTab();
         }
 
+        // Closes currently open tab
+        // TODO: Close in the core too
         private void closeTab(object sender, RoutedEventArgs e)
         {
             if (tabs.Count == 1)
@@ -140,19 +207,20 @@ namespace xi_win
             UpdateRender();
         }
 
+        // Opens a tab
         private void openTab(object sender, RoutedEventArgs e)
         {
             NewTab();
 
             var fDialog = new Microsoft.Win32.OpenFileDialog();
-            fDialog.ShowDialog();
+            fDialog.ShowDialog(); // Shows a file dialog and gets the filename selected
 
             while (fDialog.FileName == null)
             {
                 continue;
             }
 
-            var fileName = fDialog.FileName.Replace("\\", "\\\\");
+            var fileName = fDialog.FileName.Replace("\\", "\\\\"); // Weird core thing
 
             var oc = new OpenCommand(-1, fileName);
             var ec = new EditCommand(GetID(), tabs[tabs.Count - 1].tabName, oc);
@@ -163,31 +231,34 @@ namespace xi_win
             UpdateRender();
         }
 
+        // Saves current tab
         private void saveTab(object sender, RoutedEventArgs e)
         {
             string fileName = "";
             if (tabs[currentTabIndex].fileName == null)
             {
                 var fDialog = new Microsoft.Win32.SaveFileDialog();
-                fDialog.ShowDialog();
+                fDialog.ShowDialog(); // Shows save dialog and gets filename selected
 
                 while (fDialog.FileName == null)
                 {
                     continue;
                 }
 
-                fileName = fDialog.FileName.Replace("\\", "\\\\");
+                fileName = fDialog.FileName.Replace("\\", "\\\\"); // Weird core thing
             }
             else
             {
                 fileName = tabs[currentTabIndex].fileName;
             }
 
+            tabs[currentTabIndex].fileName = fileName;
             var sc = new SaveCommand(-1, fileName);
             var ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, sc);
             core.SendCommand(ec, false);
         }
 
+        // Fired when the tab is changed
         private void tabChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.Source is TabControl)
@@ -197,25 +268,126 @@ namespace xi_win
             }
         }
 
+        // Updates UI State and renders when event is fired
         private void updateTrigger(object sender, MouseButtonEventArgs e)
         {
             UpdateRender();
         }
 
+        // Updates UI State and renders when event is fired
         private void updateTrigger(object sender, MouseEventArgs e)
         {
             UpdateRender();
         }
 
+        // Fired when a key is pressed
         private void keyPressed(object sender, KeyEventArgs e)
         {
+            UpdateRender();
             if (e.Key == Key.LeftCtrl)
             {
                 lCtrl = true;
+                rCtrl = false;
             }
-            if (e.Key == Key.U && lCtrl)
+            else if (e.Key == Key.RightCtrl)
+            {
+                rCtrl = true;
+                lCtrl = false;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                rCtrl = false;
+                lCtrl = false;
+            }
+            else if (e.Key == Key.Delete)
+            {
+                DeleteBackwardCommand dbc = new DeleteBackwardCommand();
+                EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, dbc);
+                core.SendCommand(ec, false);
+                Thread.Sleep(300);
+                UpdateRender();
+            }
+            else if (e.Key == Key.LeftShift)
+            {
+                shift = true;
+            }
+            else if (e.Key == Key.U && rCtrl)
             {
                 UpdateRender();
+            }
+            else if (e.Key == Key.O && lCtrl)
+            {
+                openTab(null, null);
+            }
+            else if (e.Key == Key.S && lCtrl)
+            {
+                saveTab(null, null);
+            }
+            else if (e.Key == Key.Back)
+            {
+                textBox.CaretIndex -= 1;
+                UpdateRender();
+
+                DeleteBackwardCommand dbc = new DeleteBackwardCommand();
+                EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, dbc);
+                core.SendCommand(ec, false);
+                Thread.Sleep(300);
+                UpdateRender();
+            }
+            else
+            {
+                string input = e.Key.ToString();
+                if (input.Length == 2)
+                    input = input.Remove(0, 1);
+                if (!shift)
+                    input = input.ToLower();
+                InsertCommand ic = new InsertCommand(input);
+                EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, ic);
+                core.SendCommand(ec, false);
+                Thread.Sleep(500);
+                UpdateRender();
+            }
+        }
+
+        // Fired when a key is depressed
+        private void keyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift)
+            {
+                shift = false;
+            }
+        }
+
+        // Fired when control keys are pressed
+        private void previewPressed(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Back)
+            {
+                textBox.CaretIndex -= 1;
+                UpdateRender();
+
+                DeleteBackwardCommand dbc = new DeleteBackwardCommand();
+                EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, dbc);
+                core.SendCommand(ec, false);
+                Thread.Sleep(300);
+                UpdateRender();
+            }
+            else if (e.Key == Key.Delete)
+            {
+                DeleteBackwardCommand dbc = new DeleteBackwardCommand();
+                EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, dbc);
+                core.SendCommand(ec, false);
+                Thread.Sleep(300);
+                UpdateRender();
+            }
+            else if (e.Key == Key.Enter)
+            {
+                InsertNewlineCommand inlc = new InsertNewlineCommand();
+                EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, inlc);
+                core.SendCommand(ec, false);
+                Thread.Sleep(200);
+                UpdateRender();
+                textBox.CaretIndex += 1;
             }
         }
     }

@@ -39,6 +39,7 @@ namespace xi_win
             }
         }
 
+        // Parses c# object to JSON
         public static string ParseObject(object element)
         {
             switch (element.GetType().ToString())

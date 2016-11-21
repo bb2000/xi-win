@@ -59,7 +59,6 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="CoreCommunication.cs" />
-    <Compile Include="Editor.cs" />
     <Compile Include="EditorUI.xaml.cs">
       <DependentUpon>EditorUI.xaml</DependentUpon>
     </Compile>
