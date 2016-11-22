@@ -14,7 +14,6 @@ Much like Vim, you can enter a command mode by pressing Left Ctrl. Available com
 To get back to editing, press Escape.
 
 ## Known issues/bugs
-*   Ocassionally, there may be 2 characters inserted for a brief second when you type.
 *   The application sometimes crashes randomly.
 *   Files over 1000 lines will not load all the way.
 *   Large files can cause massive slow-downs.

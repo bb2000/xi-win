@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:xi_win"
         mc:Ignorable="d"
-        Title="EditorUI" Height="700" Width="700" Closed="closeWindow" MouseDoubleClick="updateTrigger">
+        Title="Xi-Win Editor" Height="700" Width="700" Closed="closeWindow" MouseDoubleClick="updateTrigger">
     <Grid>
         <TabControl x:Name="tabBar" HorizontalAlignment="Left" Height="23" Margin="100,0,0,0" VerticalAlignment="Top" Width="592" MouseLeave="updateTrigger"/>
         <Button x:Name="saveButton" Content=" 💾" HorizontalAlignment="Left" Margin="75,2,0,0" VerticalAlignment="Top" Width="25" Height="21" Click="saveTab"/>

@@ -1259,6 +1259,10 @@ namespace xi_win {
             }
             else
             {
+                if (command.StartsWith("\""))
+                    command = "{" + command;
+                if (!command.StartsWith("{\""))
+                    command = "{\"" + command;
                 if (!command.StartsWith("{"))
                     command = "{" + command; // Fixes weird bug
                 return ParseJSONNET(JsonConvert.DeserializeObject(command) as Newtonsoft.Json.Linq.JObject); // Parses JSON

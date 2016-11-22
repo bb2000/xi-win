@@ -32,6 +32,8 @@ namespace xi_win
         bool rCtrl;
         bool shift;
 
+        string newFileName;
+
         public EditorUI()
         {
             InitializeComponent();
@@ -43,8 +45,11 @@ namespace xi_win
             this.tabs = new List<Tab>();
             this.lCtrl = false;
             this.rCtrl = false;
+            this.newFileName = "";
 
             textBox.VerticalScrollBarVisibility = ScrollBarVisibility.Visible; // Gives us a scrollbar
+            textBox.IsReadOnly = true; // Eliminates ghosting
+            textBox.IsReadOnlyCaretVisible = true;
 
             OpenInitalTab();
         }
@@ -71,6 +76,9 @@ namespace xi_win
                         tabs.Add(new Tab(command.GetParameterFromKey("result")));
                         currentTabIndex = tabs.Count - 1;
                         tabBar.SelectedIndex = currentTabIndex;
+
+                        tabs[currentTabIndex].fileName = this.newFileName;
+                        this.newFileName = "";
 
                         ScrollCommand sc = new ScrollCommand(0, 1000); // Makes sure that all text is visible
                         EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, sc);
@@ -155,12 +163,14 @@ namespace xi_win
             string filename = Environment.CurrentDirectory + "\\README.md";
             filename = filename.Replace("\\", "\\\\");
             var oc = new OpenCommand(-1, filename);
-            var ec = new EditCommand(GetID(), tabs[tabs.Count - 1].tabName, oc);
+            var ec = new EditCommand(GetID(), tabs[0].tabName, oc);
             core.SendCommand(ec, false);
 
             Thread.Sleep(100);
 
             UpdateRender();
+
+            tabs[0].fileName = filename;
         }
 
         // Creates a new tab
@@ -221,6 +231,8 @@ namespace xi_win
             }
 
             var fileName = fDialog.FileName.Replace("\\", "\\\\"); // Weird core thing
+
+            this.newFileName = fileName;
 
             var oc = new OpenCommand(-1, fileName);
             var ec = new EditCommand(GetID(), tabs[tabs.Count - 1].tabName, oc);
@@ -307,7 +319,7 @@ namespace xi_win
                 Thread.Sleep(300);
                 UpdateRender();
             }
-            else if (e.Key == Key.LeftShift)
+            else if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
                 shift = true;
             }
@@ -334,6 +346,10 @@ namespace xi_win
                 Thread.Sleep(300);
                 UpdateRender();
             }
+            else if (e.Key == Key.Enter)
+            {
+                // Handled by preview
+            }
             else
             {
                 string input = e.Key.ToString();
@@ -343,16 +359,30 @@ namespace xi_win
                     input = input.ToLower();
                 InsertCommand ic = new InsertCommand(input);
                 EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, ic);
-                core.SendCommand(ec, false);
-                Thread.Sleep(500);
-                UpdateRender();
+                var command = core.SendCommand(ec, true);
+                //textBox.CaretIndex -= 1;
+                if (textBox.Text == "")
+                {
+                    // Do nothing
+                }
+                else if (tabs[currentTabIndex].fileName == "")
+                {
+                    textBox.CaretIndex = textBox.CaretIndex + 1;
+                    UpdateRender();
+                }
+                else
+                {
+                    textBox.CaretIndex += 1;
+                    UpdateRender();
+                }
+                UpdateRender(command);
             }
         }
 
         // Fired when a key is depressed
         private void keyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.LeftShift)
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
             {
                 shift = false;
             }
@@ -363,13 +393,14 @@ namespace xi_win
         {
             if (e.Key == Key.Back)
             {
-                //textBox.CaretIndex -= 1;
+                //textBox.CaretIndex -= 2;
                 UpdateRender();
 
                 DeleteBackwardCommand dbc = new DeleteBackwardCommand();
                 EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, dbc);
                 core.SendCommand(ec, false);
                 Thread.Sleep(300);
+                textBox.CaretIndex -= 1;
                 UpdateRender();
             }
             else if (e.Key == Key.Delete)
@@ -384,9 +415,8 @@ namespace xi_win
             {
                 InsertNewlineCommand inlc = new InsertNewlineCommand();
                 EditCommand ec = new EditCommand(GetID(), tabs[currentTabIndex].tabName, inlc);
-                core.SendCommand(ec, false);
-                Thread.Sleep(200);
-                UpdateRender();
+                var command = core.SendCommand(ec, true);
+                UpdateRender(command);
                 textBox.CaretIndex += 1;
             }
         }
